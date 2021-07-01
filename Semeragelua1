@@ -1,0 +1,501 @@
+-- {shit semirage helper created by xwk1337}--
+local entities_GetPlayerResources, entities_FindByClass, entities_GetByIndex, entities_GetLocalPlayer, entities_GetByUserID =
+    entities.GetPlayerResources,
+    entities.FindByClass,
+    entities.GetByIndex,
+    entities.GetLocalPlayer,
+    entities.GetByUserID
+local client_GetLocalPlayerIndex,
+    client_ChatSay,
+    client_WorldToScreen,
+    client_Command,
+    client_GetPlayerIndexByUserID,
+    client_SetConVar,
+    client_GetPlayerInfo,
+    client_GetConVar =
+    client.GetLocalPlayerIndex,
+    client.ChatSay,
+    client.WorldToScreen,
+    client.Command,
+    client.GetPlayerIndexByUserID,
+    client.SetConVar,
+    client.GetPlayerInfo,
+    client.GetConVar
+local client_GetPlayerNameByIndex, client_GetPlayerNameByUserID, client_ChatTeamSay, client_AllowListener =
+    client.GetPlayerNameByIndex,
+    client.GetPlayerNameByUserID,
+    client.ChatTeamSay,
+    client.AllowListener
+local globals_FrameTime,
+    globals_AbsoluteFrameTime,
+    globals_CurTime,
+    globals_TickCount,
+    globals_MaxClients,
+    globals_RealTime,
+    globals_FrameCount,
+    globals_TickInterval =
+    globals.FrameTime,
+    globals.AbsoluteFrameTime,
+    globals.CurTime,
+    globals.TickCount,
+    globals.MaxClients,
+    globals.RealTime,
+    globals.FrameCount,
+    globals.TickInterval
+local http_Get = http.Get
+local math_ceil,
+    math_tan,
+    math_huge,
+    math_log10,
+    math_randomseed,
+    math_cos,
+    math_sinh,
+    math_random,
+    math_mod,
+    math_pi,
+    math_max,
+    math_atan2,
+    math_ldexp,
+    math_floor,
+    math_sqrt,
+    math_deg,
+    math_atan =
+    math.ceil,
+    math.tan,
+    math.huge,
+    math.log10,
+    math.randomseed,
+    math.cos,
+    math.sinh,
+    math.random,
+    math.mod,
+    math.pi,
+    math.max,
+    math.atan2,
+    math.ldexp,
+    math.floor,
+    math.sqrt,
+    math.deg,
+    math.atan
+local math_fmod,
+    math_acos,
+    math_pow,
+    math_abs,
+    math_min,
+    math_log,
+    math_frexp,
+    math_sin,
+    math_tanh,
+    math_exp,
+    math_modf,
+    math_cosh,
+    math_asin,
+    math_rad =
+    math.fmod,
+    math.acos,
+    math.pow,
+    math.abs,
+    math.min,
+    math.log,
+    math.frexp,
+    math.sin,
+    math.tanh,
+    math.exp,
+    math.modf,
+    math.cosh,
+    math.asin,
+    math.rad
+local table_foreach, table_sort, table_remove, table_foreachi, table_maxn, table_getn, table_concat, table_insert =
+    table.foreach,
+    table.sort,
+    table.remove,
+    table.foreachi,
+    table.maxn,
+    table.getn,
+    table.concat,
+    table.insert
+local string_find,
+    string_lower,
+    string_format,
+    string_rep,
+    string_gsub,
+    string_len,
+    string_gmatch,
+    string_dump,
+    string_match,
+    string_reverse,
+    string_byte,
+    string_char,
+    string_upper,
+    string_gfind,
+    string_sub =
+    string.find,
+    string.lower,
+    string.format,
+    string.rep,
+    string.gsub,
+    string.len,
+    string.gmatch,
+    string.dump,
+    string.match,
+    string.reverse,
+    string.byte,
+    string.char,
+    string.upper,
+    string.gfind,
+    string.sub
+
+
+local VERSION_NUMBER = "2.12";
+local font = draw.CreateFont("Microsoft Tai Le", 32, 1000);
+local font1 = draw.CreateFont("Verdana", 22, 400);
+local ref = gui.Reference("Ragebot");
+local tab = gui.Tab(ref, "SemiRage", "SemiRage");
+local screen_w, screen_h = draw.GetScreenSize();
+local version_check_done = false;
+local update_downloaded = false;
+local update_available = false;
+local up_to_date = false;
+local updaterfont1 = draw.CreateFont("Bahnschrift", 15);
+local updaterfont2 = draw.CreateFont("Bahnschrift", 14);
+local updateframes = 0;
+local fadeout = 0;
+local spacing = 0;
+local fadein = 0;
+
+
+
+local main_box = gui.Groupbox(tab, "Main", 16, 16, 200, 0);
+local main_unlockinv = gui.Checkbox(main_box, "main.unlockinv", "Unlock Inventory", true);
+local main_fixrevolver = gui.Checkbox(main_box, "main.fixrevolver", "Disable FakeLag With R8", false);
+local dynamic_enable = gui.Checkbox(main_box, "dynamic.enable", "Dynamic Fov Enable", true);
+local dynamic_min_slider = gui.Slider(main_box, "dynamic.min", "Fov Min", 5, 1, 30);
+local dynamic_max_slider = gui.Slider(main_box, "dynamic.max", "Fov Max", 10, 1, 30);
+--local dynamic_box = gui.Groupbox(tab, "Dynamic Fov", 16, 125, 200, 0);
+
+
+
+local legit_aa_box = gui.Groupbox(tab, "Legit Anti-Aim", 232, 16, 200, 0);
+local legit_aa_enable = gui.Checkbox(legit_aa_box, "aa.enable", "Enable", false);
+local legit_aa_dis_on_fd = gui.Checkbox(legit_aa_box, "aa.disonfd", "Disable On FakeDuck", false);
+local legit_aa_type = gui.Combobox(legit_aa_box, "aa.type", "DeSync Type", "Default", "Low");
+local legit_aa_key = gui.Keybox(legit_aa_box, "aa.inverter", "Inverter", 0);
+
+local switch_box = gui.Groupbox(tab, "Switch", 448, 16, 174, 0);
+local switch_enable = gui.Checkbox(switch_box, "switch.enable", "Enable", true);
+local switch_fbaim_key = gui.Keybox(switch_box, "switch.force", "Force Baim", 0);
+local switch_awall_key = gui.Keybox(switch_box, "switch.autowall", "Auto Wall", 0);
+
+
+
+
+
+local aspect_table = {0, 2.0, 1.9, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3, 1.2, 1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3};
+local weapons_table = {"asniper", "hpistol", "lmg", "pistol", "rifle", "scout", "smg", "shotgun", "sniper", "zeus",
+                       "shared"};
+local aa_side = false;
+local switch_fbaim = false;
+local switch_awall = false;
+local fakeducking = false;
+local time = 0.0;
+local function get_name(localplayer)
+    if localplayer then
+        local lp_index = client_GetLocalPlayerIndex()
+        local n = client_GetPlayerNameByIndex(lp_index)
+        return n
+    else
+        local n = client_GetConVar("name")
+        return n
+    end
+end
+local name = get_name(pattern)
+local function rect(x, y, w, h, col)
+    draw.Color(col[1], col[2], col[3], col[4]);
+    draw.FilledRect(x, y, x + w, y + h);
+end
+
+local function gradient_h(x1, y1, x2, y2, col1, left)
+    local w = x2 - x1;
+    local h = y2 - y1;
+
+    for i = 0, w do
+        local a = (i / w) * 200;
+        local r, g, b = col1[1], col1[2], col1[3];
+        draw.Color(r, g, b, a);
+        if left then
+            draw.FilledRect(x1 + i, y1, x1 + i + 1, y1 + h);
+        else
+            draw.FilledRect(x1 + w - i, y1, x1 + w - i + 1, y1 + h);
+        end
+    end
+end
+
+local function gradient_v(x, y, w, h, col1, col2, down)
+    rect(x, y, w, h, col1);
+
+    local r, g, b = col2[1], col2[2], col2[3];
+
+    for i = 1, h do
+        local a = i / h * 255;
+        if down then
+            rect(x, y + i, w, 1, {r, g, b, a});
+        else
+            rect(x, y - i, w, 1, {r, g, b, a});
+        end
+    end
+end
+
+local function check(option)
+    if not option:GetValue() then
+        return false;
+    end
+    if not gui.GetValue("rbot.master") then
+        return false;
+    end
+    local lc = entities.GetLocalPlayer();
+    if not lc or not lc:IsAlive() then
+        return false;
+    end
+    return true;
+end
+
+local function get_weapon_class(lp)
+    local weapon_id = lp:GetWeaponID();
+
+    if weapon_id == 11 or weapon_id == 38 then
+        return "asniper";
+    elseif weapon_id == 1 or weapon_id == 64 then
+        return "hpistol";
+    elseif weapon_id == 14 or weapon_id == 28 then
+        return "lmg";
+    elseif weapon_id == 2 or weapon_id == 3 or weapon_id == 4 or weapon_id == 30 or weapon_id == 32 or weapon_id == 36 or weapon_id == 61 or weapon_id == 63 then
+        return "pistol";
+    elseif weapon_id == 7 or weapon_id == 8 or weapon_id == 10 or weapon_id == 13 or weapon_id == 16 or weapon_id == 39 or weapon_id == 60 then
+        return "rifle";
+    elseif weapon_id == 40 then
+        return "scout";
+    elseif weapon_id == 17 or weapon_id == 19 or weapon_id == 23 or weapon_id == 24 or weapon_id == 26 or weapon_id == 33 or weapon_id == 34 then
+        return "smg";
+    elseif weapon_id == 25 or weapon_id == 27 or weapon_id == 29 or weapon_id == 35 then
+        return "shotgun";
+    elseif weapon_id == 9 then
+        return "sniper";
+    elseif weapon_id == 31 then
+        return "zeus";
+    end
+
+    return "shared";
+end
+
+local function antiaim()
+    if not check(legit_aa_enable) then
+        return;
+    end
+
+ 
+
+    if fakeducking then
+        gui.SetValue("rbot.antiaim.base", "0.0 Off");
+        return;
+    end
+
+    gui.SetValue("rbot.antiaim.base", "0.0 Desync");
+    gui.SetValue("rbot.antiaim.advanced.pitch", 0);
+    gui.SetValue("rbot.antiaim.advanced.autodir.edges", 0);
+    gui.SetValue("rbot.antiaim.advanced.autodir.targets", 0);
+
+    if legit_aa_key:GetValue() ~= 0 then
+        if input.IsButtonPressed(legit_aa_key:GetValue()) then
+            if not aa_side then
+                if legit_aa_type:GetValue() == 0 then
+                    gui.SetValue("rbot.antiaim.base.rotation", -58);
+                elseif legit_aa_type:GetValue() == 1 then
+                    gui.SetValue("rbot.antiaim.base.rotation", -35);
+                end
+                gui.SetValue("rbot.antiaim.base.lby", 120);
+                aa_side = true;
+            else
+                if legit_aa_type:GetValue() == 0 then
+                    gui.SetValue("rbot.antiaim.base.rotation", 58);
+                elseif legit_aa_type:GetValue() == 1 then
+                    gui.SetValue("rbot.antiaim.base.rotation", 35);
+                end
+                gui.SetValue("rbot.antiaim.base.lby", -120);
+                aa_side = false;
+            end
+        end
+    end
+end
+
+local function dynamic()
+    if not check(dynamic_enable) then
+        return;
+    end
+
+    if dynamic_min_slider:GetValue() > dynamic_max_slider:GetValue() then
+        return;
+    end
+
+    if math.abs(globals.CurTime() - time) > 1 then
+        gui.SetValue("rbot.aim.target.fov", math.random(dynamic_min_slider:GetValue(), dynamic_max_slider:GetValue()));
+        time = globals.CurTime();
+    end
+end
+
+local function switch()
+    draw.Color(15,15,15,235);
+    draw.FilledRect(5 , 5, 200 , 26);
+
+    draw.Color(255,0,0,235);
+    draw.FilledRect(5 , 25, 200 , 26);
+
+    draw.Color(255,220,220,255);
+    draw.Text(25, 10, "AIMWARE.net".." | ".. name);
+
+    local lc = entities.GetLocalPlayer();
+    if lc and lc:IsAlive() then
+        draw.SetFont(updaterfont1);
+
+       
+
+        draw.Color(15,15,15,235);
+		draw.FilledRect(0 , 510, 170 , 536);
+
+        draw.Color(255,220,220,255);
+        draw.Text(5, 517, "SemiRage - by Niggafish47");
+
+		draw.Color(15,15,15,205);
+		draw.FilledRect(0 , 537, 170 , 690);
+
+		draw.Color(255, 0, 0,255);
+		draw.FilledRect( 0 , 536, 170, 537);
+		
+        draw.SetFont(font1);
+        	
+        draw.Color(255, 255, 255, 255);
+        draw.Text(screen_w / 2 - 941, screen_h / 2, "Fov:");
+        draw.Text(screen_w / 2 - 941, screen_h / 2 + 40, "DMG:");
+        draw.Text(screen_w / 2 - 941, screen_h / 2 + 120, "Accuracy:");
+
+        draw.Color(0, 255, 0, 255);
+
+        draw.Text(screen_w / 2 - 900, screen_h / 2, gui.GetValue("rbot.aim.target.fov"," °"));
+        draw.Color(0, 255, 0, 255);
+        draw.Text(screen_w / 2 - 890, screen_h / 2 + 40, gui.GetValue("rbot.accuracy.weapon." .. get_weapon_class(lc) .. ".mindmg"));
+
+        if switch_awall then
+            draw.Color(0, 255, 0, 255);
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 60, "AWALL");
+        else
+            draw.Color(255, 0, 0, 255);
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 60, "AWALL");
+        end
+
+        if switch_fbaim then
+            draw.Color(0, 255, 0, 255);
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 80, "Baim");
+        else
+            draw.Color(255, 0, 0, 255);
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 80, "Baim");
+        end
+
+        if gui.GetValue("rbot.accuracy.posadj.resolver") then
+            draw.Color(0, 255, 0, 255);
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 100, "Resolver");
+        else
+            draw.Color(255, 0, 0, 255);
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 100, "Resolver");
+        end
+
+        local accuracy = 100 - math.floor(entities.GetLocalPlayer():GetWeaponInaccuracy() * 10 ^ 3 + 0.5) / 10 ^ 3 * 100;
+
+        if accuracy > 90 then
+            draw.Color(0, 255, 0, 255);
+            draw.Text(screen_w / 2 - 850, screen_h / 2 + 120, "High");
+        else
+            draw.Color(255, 0, 0, 255);
+            draw.Text(screen_w / 2 - 850, screen_h / 2 + 120, "Low");
+        end
+        if (gui.GetValue("rbot.master") == true ) and (gui.GetValue("rbot.aim.enable") == true) then
+            onoroff = "Rage"
+            draw.Color(0, 255, 0, 255)
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 20, onoroff)     
+            else
+            onoroff = "Rage"
+            draw.Color(255, 0, 0, 255)
+            draw.Text(screen_w / 2 - 941, screen_h / 2 + 20, onoroff)     
+            
+        end
+    end
+ 
+    if not check(switch_enable) then
+        return;
+    end
+
+    if switch_fbaim_key:GetValue() ~= 0 then
+        if input.IsButtonPressed(switch_fbaim_key:GetValue()) then
+            if not switch_fbaim then
+                for i, v in next, weapons_table do
+                    gui.SetValue("rbot.hitscan.mode." .. v .. ".bodyaim.force", 1);
+                end
+                switch_fbaim = true;
+            else
+                for i, v in next, weapons_table do
+                    gui.SetValue("rbot.hitscan.mode." .. v .. ".bodyaim.force", 0);
+                end
+                switch_fbaim = false;
+            end
+        end
+    end
+
+    if switch_awall_key:GetValue() ~= 0 then
+        if input.IsButtonPressed(switch_awall_key:GetValue()) then
+            if not switch_awall then
+                for i, v in next, weapons_table do
+                    gui.SetValue("rbot.hitscan.mode." .. v .. ".autowall", 1);
+                end
+                switch_awall = true;
+            else
+                for i, v in next, weapons_table do
+                    gui.SetValue("rbot.hitscan.mode." .. v .. ".autowall", 0);
+                end
+                switch_awall = false;
+            end
+        end
+    end
+end
+
+
+local function main()
+    if legit_aa_dis_on_fd:GetValue() then
+        local fdvalue = gui.GetValue("rbot.antiaim.extra.fakecrouchkey");
+        if fdvalue ~= 0 then
+            if input.IsButtonDown(fdvalue) then
+                fakeducking = true;
+            else
+                fakeducking = false;
+            end
+        end
+    else
+        fakeducking = false;
+    end
+
+    if check(main_fixrevolver) then
+        local weaponid = entities.GetLocalPlayer():GetPropEntity("m_hActiveWeapon"):GetWeaponID();
+
+        if weaponid == 64 then
+            gui.SetValue("misc.fakelag.enable", false);
+        else
+            gui.SetValue("misc.fakelag.enable", true);
+        end
+    end
+
+ 
+
+end
+
+callbacks.Register("Draw", "legit_aa", antiaim);
+callbacks.Register("Draw", "dynamic_fov", dynamic);
+callbacks.Register("Draw", "switch", switch);
+
+callbacks.Register("Draw", "defaults", main);
