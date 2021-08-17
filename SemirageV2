@@ -1425,7 +1425,7 @@ end
  main_unlockinv = gui.Checkbox(misc_box, "main.unlockinv", "Unlock Inventory", true);
 on = gui.Checkbox(misc_box, "showvote", "Vote Revealer ", 1)
  Enable_Killsays = gui.Checkbox(misc_box, "enable.killsays", "Enable Killsay", false)
- Killsay_Mode = gui.Combobox(misc_box, "killsay.mode", "Select Killsay Mode", "NiggaFish.lua",""AimWare.net)
+ Killsay_Mode = gui.Combobox(misc_box, "killsay.mode", "Select Killsay Mode", "NiggaFish.lua","AimWare.net")
   hudweapon_enable = gui.Checkbox(misc_box, "hudweapon.enabled", "Scoreboard", true)
   menu = {filter = gui.Multibox(misc_box, "Weapon filter")}
   itemList = {"Primary", "Secondary", "Knife/Taser", "Grenades", "C4", "Defuser", "Armor", "Other"}
@@ -2109,7 +2109,7 @@ local function gameEvents(event)
 		teamDamageArray = {}
 	end
 end
-
+--3rd 
 
 
 local thirdperson = "esp.local.thirdperson"
@@ -2143,7 +2143,7 @@ local function third_person_esp()
     local watermark_text_size_x, watermark_text_size_y = draw.GetTextSize(watermarktext)
 	
 	draw.Color(0, 0, 0, 150)
-	draw.FilledRect(head_pos_x + 47, head_pos_y, head_pos_x + watermark_text_size_x + 56, head_pos_y - 30); 
+	draw.FilledRect(head_pos_x + 47, head_pos_y, head_pos_x + watermark_text_size_x + 56, head_pos_y - 30); -- gray background
 	
 	draw.Color(bomb_col:GetValue());
     draw.FilledRect(head_pos_x + 47, head_pos_y - 32, head_pos_x + watermark_text_size_x + 56, head_pos_y - 30); -- top line
@@ -2206,7 +2206,10 @@ local function draw_Func()
 end
 
 
+---
+--©thekorol
 
+--local enhancement = gui.Reference("Misc", "Enhancement", "Appearance")
 
 local function filter_weapon(wepList)
 	for index, value in ipairs(wepList) do
@@ -2383,7 +2386,7 @@ callbacks.Register("FireGameEvent", "hud_weapon_events", function(event)
 		end
 	end
 end)
-
+--©thekorol
 
 --end
 
